@@ -1,4 +1,6 @@
 import ballerina/http;
+import ballerina/time;
+import ballerina/io;
 
 // Define Course record
 type Course record {
@@ -70,5 +72,26 @@ service /programmes on new http:Listener(8080) {
             response.setJsonPayload({ "message": "Programme not found" });
             check caller->respond(response);
         }
+    }
+
+    //Retrieve all  programmes that are due for review.
+    resource function get reiviewDueProgramme(http:Caller caller) returns error? {
+        time:Seconds reviewCycle = 5*365*24*60*60;
+        io:println("reviewCycle "+reviewCycle.toString());
+
+        time:Utc currentTime = time:utcNow();
+
+        //Filtering Programmes that are due for review
+        Programme[] dueProgramme = [];
+        foreach Programme programme in programmeTable.toArray() {
+            // Parse the registration date to time:Utc
+            time:Utc registrationTime = check time:utcFromString(programme.registrationDate);
+            time:Seconds elapsedTime = time:utcDiffSeconds(currentTime, registrationTime);
+            if  elapsedTime >= reviewCycle {
+                io:println("reviewCycle has been breached "+elapsedTime.toString());
+                dueProgramme.push(programme);
+            }
+        }
+        check caller->respond({message: dueProgramme});
     }
 }
