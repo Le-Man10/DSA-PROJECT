@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package online_shop;
+
+// Defining User Types
+enum UserType {
+    Customer = 0;
+    Admin = 1;
+}
+
+
+// Product Status Enumeration
+// Enumeration represents various possible statuses that a product can have
+enum ProductStatus {
+    Available = 0;
+    Out_Of_Stock = 1;
+}
+
+
+// Message Structure For a Product
+message Product {
+    string name = 1;
+    string description = 2;
+    double price = 3;
+    int32 stock_quantity = 4;
+
+    // sku = product code
+    string sku = 5;
+    ProductStatus status = 6;
+}
+
+
+// Request Message For When Adding a Product Into The Stock Table
+message AddProductReq {
+    Product product = 1;
+}
+
+
+// Response Message For When Adding a Product Into The Stock Table
+// Adding a Unique Code For The Product
+message AddProductResp {
+    string product_code = 1;
+}
+
+
+// Request Message For When Updating a Product In The Stock Table
+message UpdateProductReq {
+    string sku = 1;
+    Product updated_product = 2;
+}
+
+
+// Response Message For When Updating a Product In The Stock Table
+message UpdateProductResp {
+    string message = 1;
+}
+
+
+// Request Message For When Removing a Product From The Stock Table
+message RemoveProductReq {
+    string sku = 1;
+}
+
+
+// Response Message For When Removing a Product From The Stock Table
+message RemoveProductResp {
+
+    // Display The Updated List of Products After Removal
+    repeated Product updated_products = 1;
+}
+
+
+// Request Message For When Listing Available Products In The Stock Table
+message ListAvailableProductsReq {}
+
+
+// Response Message For When Listing Available Products In The Stock Table
+message ListAvailableProductsResp {
+    repeated Product products = 1;
+}
+
+
+// Request Message For When Searching Up a Product In The Stock Table
+message SearchProductReq {
+    string sku = 1;
+}
+
+
+// Response Message For When Searching Up a Product In The Stock Table
+message SearchProductResp {
+    Product product = 1;
+
+    // "Product Not Found!" or "Product Details"
+    string message = 2;
+}
+
+
+// Request Message For When Adding a Product To The Shopping Cart
+message AddToCartReq {
+    string sku = 1;
+    string user_id = 2;
+}
+
+
+// Response Message For When Addiing a Product To The Shopping Cart
+message AddToCartResp {
+
+    // Displaying The Confirmation Message
+    string message = 1;
+}
+
+
+// Request Message For When Placing An Order
+message PlaceOrderReq {
+    string user_id = 1;
+}
+
+
+// Response Message For When Placing An Order
+message PlaceOrderResp {
+    // The Unique Order ID
+    string order_id = 1;
+
+    // Displaying The Confirmation Message
+    string message = 2;
+}
+
+
+// Message Displayed To User For The User Profile
+message UserProfile {
+    string user_id = 1;
+    UserType user_type = 2;
+}
+
+
+// Streaming Request Message For Creating Multiple Users On The Online Shopping Platform
+message CreateUsersResp {
+    string message = 1;
+}
+
+
+// Streaming Response Message For Creating Multiple Users On The Online Shopping Platform
+message CreateUsersReq {
+    string message = 1;
+}
+
+
+// Defining The gRPC Service Of The Online Shopping System
+service OnlineShoppingService {
+
+    // Defining Admin Operations
+    rpc add_product (AddProductReq) returns (AddProductResp);
+    rpc update_product (UpdateProductReq) returns (UpdateProductResp);
+    rpc remove_product (RemoveProductReq) returns (RemoveProductResp);
+    rpc list_available_products (ListAvailableProductsReq) returns (ListAvailableProductsResp);
+    rpc create_users (stream CreateUsersReq) returns (CreateUsersResp);
+
+    // Defining Customer Operations
+    rpc search_product (SearchProductReq) returns (SearchProductResp);
+    rpc add_to_cart (AddToCartReq) returns (AddToCartResp);
+    rpc place_order (PlaceOrderReq) returns (PlaceOrderResp);
+} 
+
+
+// Created by Avatar C'aura
