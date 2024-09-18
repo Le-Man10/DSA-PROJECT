@@ -1,6 +1,6 @@
 [package]
 org = "tech"
-name = "server"
+name = "online_shop_service"
 version = "0.1.0"
 distribution = "2201.9.2"
 
