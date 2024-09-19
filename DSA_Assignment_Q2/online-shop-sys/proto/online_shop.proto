@@ -86,13 +86,6 @@ message SearchProductReq {
 }
 
 
-// Response Message For When Searching Up a Product In The Stock Table
-message SearchProductResp {
-    Product product = 1;
-
-    // "Product Not Found!" or "Product Details"
-    string message = 2;
-}
 
 
 // Request Message For When Adding a Product To The Shopping Cart
@@ -159,7 +152,7 @@ service OnlineShoppingService {
     rpc create_users (stream CreateUsersReq) returns (CreateUsersResp);
 
     // Defining Customer Operations
-    rpc search_product (SearchProductReq) returns (SearchProductResp);
+    rpc search_product (SearchProductReq) returns (Product);
     rpc add_to_cart (AddToCartReq) returns (AddToCartResp);
     rpc place_order (PlaceOrderReq) returns (PlaceOrderResp);
 } 
