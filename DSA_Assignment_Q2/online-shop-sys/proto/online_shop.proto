@@ -141,7 +141,10 @@ message CreateUsersResp {
 
 // Streaming Response Message For Creating Multiple Users On The Online Shopping Platform
 message CreateUsersReq {
-    string message = 1;
+    string username = 1;
+    string email = 2;
+    string password = 3;
+    UserType user = 4;
 }
 
 

@@ -20,9 +20,7 @@ table<Products> key(sku) productTable = table[];
 @grpc:Descriptor {value: ONLINE_SHOP_DESC}
 service "OnlineShoppingService" on ep {
 
-
     remote function add_product(AddProductReq value) returns AddProductResp|error {
-
         Products payload = check value.fromJsonWithType(Products);
         if productTable.hasKey(payload.sku){
             return error("Product already exists");
@@ -31,7 +29,6 @@ service "OnlineShoppingService" on ep {
             AddProductResp resp = {product_code: "Product has been successfully added"};
             return resp;
         }
-        
     }
 
     //remote function update_product(UpdateProductReq value) returns UpdateProductResp|error {
