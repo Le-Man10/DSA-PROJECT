@@ -40,8 +40,19 @@ service "OnlineShoppingService" on ep {
     //remote function list_available_products(ListAvailableProductsReq value) returns ListAvailableProductsResp|error {
     //}
 
-    //remote function search_product(SearchProductReq value) returns SearchProductResp|error {
-    //}
+    remote function search_product(SearchProductReq value) returns Product|error {
+         foreach var product in productTable {
+
+           if (product.sku == value.sku) {
+               Product response={name: product.name, description:product.description, price:product.price, stock_quantity:product.stock_quantity, sku:product.sku,status:product.status};
+                return response;
+                
+            }
+            }
+                 
+               return error("Product not found.");
+            
+    }
 
     //remote function add_to_cart(AddToCartReq value) returns AddToCartResp|error {
     //}
