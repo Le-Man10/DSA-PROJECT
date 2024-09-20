@@ -83,6 +83,7 @@ service "OnlineShoppingService" on ep {
     remote function list_available_products(ListAvailableProductsReq listReq) returns ListAvailableProductsResp {
         ListAvailableProductsResp response = {
             products: from Products product in productTable 
+            where product.status == Available 
             select {
                 name: product.name,
                 description: product.description,
