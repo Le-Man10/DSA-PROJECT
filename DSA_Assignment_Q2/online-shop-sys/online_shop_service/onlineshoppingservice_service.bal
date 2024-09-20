@@ -15,6 +15,20 @@ type Products record {
     readonly string sku;
     ProductStatus status;
 };
+
+enum userType {
+    Customer ,
+    Admin 
+}
+
+type User record{
+    readonly string username;
+    string email ;
+    string password;
+    UserType user ;
+};
+table<User> key(username) UserTable = table[];
+
 table<Products> key(sku) productTable = table[];
 
 @grpc:Descriptor {value: ONLINE_SHOP_DESC}
@@ -60,7 +74,44 @@ service "OnlineShoppingService" on ep {
     //remote function place_order(PlaceOrderReq value) returns PlaceOrderResp|error {
     //}
 
-    //remote function create_users(stream<CreateUsersReq, grpc:Error?> clientStream) returns CreateUsersResp|error {
-    //}
+    remote function create_users(stream<CreateUsersReq, grpc:Error?> clientStream) returns CreateUsersResp|error {
+        int totalCount = 0;
+        int fcount = 0;
+        string []usernameExistsError=[];
+        CreateUsersResp resp = {message: ""};
+        CreateUsersResp|grpc:Error? r = check clientStream.forEach(function(CreateUsersReq req){
+            totalCount = totalCount+1;
+            var user = req.fromJsonWithType(User);
+            if(user is User){
+                if (user.username == ""){
+                fcount = fcount+1;
+            }else {
+                if UserTable.hasKey(user.username){
+                fcount = fcount+1;
+                usernameExistsError.push(user.username);
+            }else {
+                UserTable.add(user);
+            }
+
+            }
+            
+        }else {
+            resp = {message: "Please enter in json format"};
+            return;
+        }
+        
+        });
+
+        if(r is grpc:Error){
+            return r;
+        }else if (r is CreateUsersResp) {
+            resp = r;
+        }else {
+            resp = {message: fcount.toString() + " out of " + totalCount.toString() + " Users have been created. The following users already exist in the system "+usernameExistsError.toString()};
+        }
+        return resp;
+            
+        
+    }
 }
 
