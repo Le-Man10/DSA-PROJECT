@@ -37,11 +37,14 @@ service "OnlineShoppingService" on ep {
     //remote function add_product(UpdateProductReq value) returns UpdateProductResp|error {
     //}
     remote function add_product(AddProductReq value) returns AddProductResp|error {
-        Products payload = check value.fromJsonWithType(Products);
-        if productTable.hasKey(payload.sku){
+        Product payload ;
+        Products product;
+        payload = value.product;
+        product = {...payload};
+        if productTable.hasKey(product.sku){
             return error("Product already exists");
         }else {
-            productTable.add(payload);
+            productTable.add(product);
             AddProductResp resp = {product_code: "Product has been successfully added"};
             return resp;
         }
