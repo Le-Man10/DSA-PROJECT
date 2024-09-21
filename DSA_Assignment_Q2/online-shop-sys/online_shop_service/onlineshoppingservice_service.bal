@@ -99,8 +99,6 @@ service "OnlineShoppingService" on ep {
     }
 
 
-    //remote function search_product(SearchProductReq value) returns SearchProductResp|error {
-    //}
 
     remote function search_product(SearchProductReq value) returns Product|error {
         foreach var product in productTable {
