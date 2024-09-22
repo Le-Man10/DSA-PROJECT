@@ -26,6 +26,7 @@ type User record{
     string email ;
     string password;
     UserType user ;
+    Products[] cart = [];
 };
 table<User> key(username) UserTable = table[];
 
@@ -116,6 +117,47 @@ service "OnlineShoppingService" on ep {
 
     //remote function place_order(PlaceOrderReq value) returns PlaceOrderResp|error {
     //}
+
+   remote function add_to_cart(AddToCartReq value) returns AddToCartResp|error {
+        if productTable.hasKey(value.sku) {
+            Products product = productTable.get(value.sku);
+            if product.status == Out_Of_Stock {
+                return error("Product is out of stock");
+            }
+            if UserTable.hasKey(value.user_id) {
+                User user = UserTable.get(value.user_id);
+                user.cart.push(product);
+                UserTable.put(user);
+            } else {
+                User newUser = {username: value.user_id, email: "", password: "", user: Customer, cart: [product]};
+                UserTable.add(newUser);
+            }
+            return {message: "Product added to cart"};
+        } else {
+            return error("Product not found");
+        }
+    }
+
+    remote function place_order(PlaceOrderReq value) returns PlaceOrderResp|error {
+        if UserTable.hasKey(value.user_id) {
+            User user = UserTable.get(value.user_id);
+            if user.cart.length() > 0 {
+                //Products[] removedProducts = user.cart;
+                user.cart = [];
+                UserTable.put(user); // Clear the cart after placing the order
+                return {order_id: "unique_order_id", message: "Order placed successfully"};
+            } else {
+                return error("Cart is empty");
+            }
+        } else {
+            return error("User not found");
+        }
+    }
+
+
+
+
+
 
     remote function create_users(stream<CreateUsersReq, grpc:Error?> clientStream) returns CreateUsersResp|error {
         int totalCount = 0;
