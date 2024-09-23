@@ -63,33 +63,16 @@ service "OnlineShoppingService" on ep {
     //}
 
     remote function update_product(UpdateProductReq value) returns UpdateProductResp|error {
-
-             int productId = request.product_id;
-        
-            if productDatabase.hasKey(productId.toString()) {
-                // Update product details
-                productDatabase[productId.toString()] = {
-                    productId: productId,
-                    name: request.name,
-                    description: request.description,
-                    price: request.price,
-                    stock: request.stock
-                };
-            
-                log:printInfo("Product updated: " + request.name);
-            
-                return {
-                    success: true,
-                    message: "Product updated successfully"
-                };
-            } else {
-                return {
-                    success: false,
-                    message: "Product not found"
-                };
-            }
-        }
+        if productTable.hasKey(value.sku) {
+            Products updatedProduct = check value.updated_product.fromJsonWithType(Products);
+            productTable.put(updatedProduct);
+            UpdateProductResp resp = {message: "Product has been successfully updated"};
+            return resp;
+        } else {
+            return error("Product not found");
+        }
     }
+
 
     //remote function remove_product(RemoveProductReq value) returns RemoveProductResp|error {
     //}
