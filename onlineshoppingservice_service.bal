@@ -59,6 +59,9 @@ service "OnlineShoppingService" on ep {
         }
     }
 
+    //remote function update_product(UpdateProductReq value) returns UpdateProductResp|error {
+    //}
+
     remote function update_product(UpdateProductReq value) returns UpdateProductResp|error {
 
              int productId = request.product_id;
